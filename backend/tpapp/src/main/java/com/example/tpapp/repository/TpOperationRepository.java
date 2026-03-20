@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface TpOperationRepository extends JpaRepository<TpOperation, Long> {
 
-    List<TpOperation> findByProductIdOrderByOperationOrderAsc(Long productId);
+    List<TpOperation> findByProductIdOrderByOperationOrderAscOperationNumberAscIdAsc(Long productId);
 }

@@ -44,7 +44,8 @@ public class ProductService {
         TpProduct product = productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Продукт не найден: id=" + id));
 
-        List<OperationDto> operations = operationRepository.findByProductIdOrderByOperationOrderAsc(id)
+        List<OperationDto> operations = operationRepository
+                .findByProductIdOrderByOperationOrderAscOperationNumberAscIdAsc(id)
                 .stream()
                 .map(this::toOperationDto)
                 .toList();

@@ -44,10 +44,11 @@ export default function ProductDetailsPage() {
     loadProduct();
   }, [id]);
 
-  const formatValue = (value: unknown) => {
-    if (value === null || value === undefined || value === "") return "—";
-    return String(value);
+  const hasValue = (value: unknown) => {
+    return value !== null && value !== undefined && String(value).trim() !== "";
   };
+
+  const formatValue = (value: unknown) => String(value);
 
   if (loading) {
     return (
@@ -65,14 +66,21 @@ export default function ProductDetailsPage() {
     return <Alert severity="info">Процесс не найден.</Alert>;
   }
 
+  const productMetaItems = [
+    { label: "Код", value: product.code },
+    { label: "Статус", value: product.status },
+    { label: "Подразделение", value: product.departmentName },
+    { label: "Группа", value: product.groupName },
+    { label: "Количество выхода", value: product.outputQuantity },
+  ].filter((item) => hasValue(item.value));
+
   return (
     <Stack spacing={3}>
       <Card
         sx={{
           borderRadius: 4,
           overflow: "hidden",
-          background:
-            "linear-gradient(135deg, #1296d4 0%, #0b7db2 100%)",
+          background: "linear-gradient(135deg, #1296d4 0%, #0b7db2 100%)",
         }}
       >
         <CardContent sx={{ p: { xs: 3, md: 4 } }}>
@@ -83,7 +91,6 @@ export default function ProductDetailsPage() {
             alignItems={{ xs: "flex-start", md: "center" }}
           >
             <Stack spacing={2}>
-
               <Box>
                 <Typography
                   sx={{
@@ -140,125 +147,74 @@ export default function ProductDetailsPage() {
               {product.name}
             </Typography>
 
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                gap: 2,
-              }}
-            >
+            {productMetaItems.length > 0 && (
               <Box
                 sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e3e8ef",
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                  gap: 2,
                 }}
               >
-                <Typography sx={{ fontSize: 15, color: "text.secondary", mb: 0.5 }}>
-                  Код
-                </Typography>
-                <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
-                  {formatValue(product.code)}
-                </Typography>
-              </Box>
+                {productMetaItems.map((item, index) => {
+                  const isLastOdd =
+                    productMetaItems.length % 2 === 1 &&
+                    index === productMetaItems.length - 1;
 
+                  return (
+                    <Box
+                      key={item.label}
+                      sx={{
+                        p: 2,
+                        borderRadius: 3,
+                        backgroundColor: "#f8fafc",
+                        border: "1px solid #e3e8ef",
+                        gridColumn: isLastOdd ? { xs: "auto", md: "1 / span 2" } : "auto",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: 15, color: "text.secondary", mb: 0.5 }}>
+                        {item.label}
+                      </Typography>
+                      <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
+                        {formatValue(item.value)}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Box>
+            )}
+
+            {hasValue(product.productDescription) && (
               <Box
                 sx={{
-                  p: 2,
+                  p: 3,
                   borderRadius: 3,
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e3e8ef",
+                  backgroundColor: "#fff8e1",
+                  border: "2px solid #ffe082",
                 }}
               >
-                <Typography sx={{ fontSize: 15, color: "text.secondary", mb: 0.5 }}>
-                  Статус
+                <Typography
+                  sx={{
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: "#7a5a00",
+                    mb: 1,
+                  }}
+                >
+                  Описание процесса
                 </Typography>
-                <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
-                  {formatValue(product.status)}
+
+                <Typography
+                  sx={{
+                    fontSize: 22,
+                    lineHeight: 1.5,
+                    fontWeight: 600,
+                    color: "#1f2937",
+                  }}
+                >
+                  {formatValue(product.productDescription)}
                 </Typography>
               </Box>
-
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e3e8ef",
-                }}
-              >
-                <Typography sx={{ fontSize: 15, color: "text.secondary", mb: 0.5 }}>
-                  Подразделение
-                </Typography>
-                <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
-                  {formatValue(product.departmentName)}
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e3e8ef",
-                }}
-              >
-                <Typography sx={{ fontSize: 15, color: "text.secondary", mb: 0.5 }}>
-                  Группа
-                </Typography>
-                <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
-                  {formatValue(product.groupName)}
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  backgroundColor: "#f8fafc",
-                  border: "1px solid #e3e8ef",
-                  gridColumn: { xs: "auto", md: "1 / span 2" },
-                }}
-              >
-                <Typography sx={{ fontSize: 15, color: "text.secondary", mb: 0.5 }}>
-                  Количество выхода
-                </Typography>
-                <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
-                  {formatValue(product.outputQuantity)}
-                </Typography>
-              </Box>
-            </Box>
-
-            <Box
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                backgroundColor: "#fff8e1",
-                border: "2px solid #ffe082",
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: "#7a5a00",
-                  mb: 1,
-                }}
-              >
-                Описание процесса
-              </Typography>
-
-              <Typography
-                sx={{
-                  fontSize: 22,
-                  lineHeight: 1.5,
-                  fontWeight: 600,
-                  color: "#1f2937",
-                }}
-              >
-                {formatValue(product.productDescription)}
-              </Typography>
-            </Box>
+            )}
 
             <Box>
               {!productionStarted ? (
@@ -301,12 +257,13 @@ export default function ProductDetailsPage() {
 
       {productionStarted ? (
         <ProductionFlow
-  operations={product.operations}
-  onOperationUpdated={loadProduct}
-/>
+          operations={product.operations}
+          onOperationUpdated={loadProduct}
+        />
       ) : (
         <Alert severity="info">
-          Нажмите «Начать производство», чтобы открыть этапы по очереди и запустить таймер.
+          Нажмите «Начать производство», чтобы открыть этапы по очереди и запустить
+          таймер.
         </Alert>
       )}
     </Stack>
