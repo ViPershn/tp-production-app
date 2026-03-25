@@ -18,6 +18,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { api } from "../api/client";
 import type { Operation, UpdateOperationRequest } from "../types/product";
+import { useAuth } from "../auth/AuthProvider";
 
 type Props = {
   operations: Operation[];
@@ -66,6 +67,9 @@ export default function ProductionFlow({
   operations,
   onOperationUpdated,
 }: Props) {
+  const { hasAnyRole } = useAuth();
+  const canEdit = hasAnyRole("tp_editor", "tp_admin");
+
   const [selectedOperationId, setSelectedOperationId] = useState<number | null>(null);
   const [editorStageIndex, setEditorStageIndex] = useState(0);
 
@@ -204,6 +208,12 @@ export default function ProductionFlow({
   }, [editorEnabled, productionStageIndex]);
 
   useEffect(() => {
+    if (!canEdit && editorEnabled) {
+      setEditorEnabled(false);
+    }
+  }, [canEdit, editorEnabled]);
+
+  useEffect(() => {
     if (currentStageOperations.length === 0) {
       setSelectedOperationId(null);
       return;
@@ -323,7 +333,7 @@ export default function ProductionFlow({
   };
 
   const handleSaveChanges = async () => {
-    if (!selectedOperation) return;
+    if (!selectedOperation || !canEdit) return;
 
     try {
       setSaveLoading(true);
@@ -400,43 +410,45 @@ export default function ProductionFlow({
                 sx={{ height: 12, borderRadius: 10 }}
               />
 
-              <Box>
-                {!editorEnabled ? (
-                  <Button
-                    variant="outlined"
-                    startIcon={<EditIcon />}
-                    onClick={() => setEditorEnabled(true)}
-                    sx={{
-                      minWidth: 280,
-                      minHeight: 56,
-                      fontSize: 18,
-                      fontWeight: 700,
-                      borderRadius: 3,
-                    }}
-                  >
-                    Включить режим редактора
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    onClick={() => {
-                      setEditorEnabled(false);
-                      setSaveError("");
-                    }}
-                    sx={{
-                      minWidth: 280,
-                      minHeight: 56,
-                      fontSize: 18,
-                      fontWeight: 700,
-                      borderRadius: 3,
-                      boxShadow: "none",
-                    }}
-                  >
-                    Отключить режим редактора
-                  </Button>
-                )}
-              </Box>
+              {canEdit && (
+                <Box>
+                  {!editorEnabled ? (
+                    <Button
+                      variant="outlined"
+                      startIcon={<EditIcon />}
+                      onClick={() => setEditorEnabled(true)}
+                      sx={{
+                        minWidth: 280,
+                        minHeight: 56,
+                        fontSize: 18,
+                        fontWeight: 700,
+                        borderRadius: 3,
+                      }}
+                    >
+                      Включить режим редактора
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="warning"
+                      onClick={() => {
+                        setEditorEnabled(false);
+                        setSaveError("");
+                      }}
+                      sx={{
+                        minWidth: 280,
+                        minHeight: 56,
+                        fontSize: 18,
+                        fontWeight: 700,
+                        borderRadius: 3,
+                        boxShadow: "none",
+                      }}
+                    >
+                      Отключить режим редактора
+                    </Button>
+                  )}
+                </Box>
+              )}
             </Stack>
           </CardContent>
         </Card>
@@ -785,7 +797,7 @@ export default function ProductionFlow({
                     )}
                   </Box>
 
-                  {editorEnabled && (
+                  {editorEnabled && canEdit && (
                     <Stack
                       direction={{ xs: "column", sm: "row" }}
                       spacing={2}

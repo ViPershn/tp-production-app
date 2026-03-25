@@ -1,8 +1,10 @@
-import { AppBar, Box, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Stack, Toolbar, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
 
 export default function AppHeader() {
   const navigate = useNavigate();
+  const { username, logout } = useAuth();
 
   return (
     <AppBar
@@ -67,6 +69,34 @@ export default function AppHeader() {
             </Typography>
           </Box>
         </Box>
+
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          sx={{ ml: "auto" }}
+        >
+          <Typography sx={{ color: "#fff", fontWeight: 700 }}>
+            {username || "Пользователь"}
+          </Typography>
+
+          <Button
+            variant="contained"
+            onClick={() => void logout()}
+            sx={{
+              backgroundColor: "#ffffff",
+              color: "#0b7db2",
+              boxShadow: "none",
+              fontWeight: 700,
+              "&:hover": {
+                backgroundColor: "#eef8fd",
+                boxShadow: "none",
+              },
+            }}
+          >
+            Выйти
+          </Button>
+        </Stack>
       </Toolbar>
     </AppBar>
   );
